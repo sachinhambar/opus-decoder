@@ -45,8 +45,14 @@ export default function WASMAudioDecoderCommon(caller) {
             offset = 0;
 
           while (i < buffers.length) {
-            ret.set(buffers[i], offset);
-            offset += buffers[i++].length;
+            if(typeof buffers[0] == 'number') {
+              ret[i] = buffers[i];
+              i++;
+            }
+            else {
+              ret.set(buffers[i], offset);
+              offset += buffers[i++].length;
+            }
           }
 
           return ret;
@@ -69,7 +75,12 @@ export default function WASMAudioDecoderCommon(caller) {
 
           for (i = 0; i < channelsDecoded; i++) {
             const channel = [];
-            for (j = 0; j < input.length; ) channel.push(input[j++][i]);
+            if(typeof input[0] == 'number') {
+              for (j = 0; j < samplesDecoded; j+=channelsDecoded) channel.push(input[j + i]);
+            }
+            else {
+              for (j = 0; j < input.length; ) channel.push(input[j++][i]);
+            }
             channelData.push(
               WASMAudioDecoderCommon.concatFloat32(channel, samplesDecoded)
             );
